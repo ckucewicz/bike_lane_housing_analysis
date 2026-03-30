@@ -27,24 +27,18 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text-primary);
-  min-height: 100vh;
   font-size: 14px;
   line-height: 1.5;
 }
 
-/* ── Header ── */
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 18px 40px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+/* ── Hero ── */
+.hero-wrap { background: var(--surface); border-bottom: 1px solid var(--border); }
+.hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 40px 40px;
 }
-header h1 { font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
-header p  { font-size: 13px; color: var(--text-secondary); }
-.tag {
+.hero-tag {
   font-family: var(--mono);
   font-size: 10px;
   background: var(--accent-light);
@@ -52,89 +46,87 @@ header p  { font-size: 13px; color: var(--text-secondary); }
   padding: 3px 8px;
   border-radius: 3px;
   letter-spacing: 0.05em;
-  margin-left: auto;
+  display: inline-block;
+  margin-bottom: 14px;
 }
+.hero h1 {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  max-width: 600px;
+}
+.hero p { font-size: 14px; color: var(--text-secondary); max-width: 560px; line-height: 1.7; }
+.hero-meta { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+.hero-meta-item { font-size: 12px; color: var(--text-hint); }
+.hero-meta-item strong { color: var(--text-secondary); font-weight: 500; }
 
-/* ── Nav ── */
+/* ── Sticky nav ── */
 nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 40px;
   display: flex;
-  gap: 0;
   overflow-x: auto;
 }
-nav button {
+nav a {
   font-family: var(--font);
   font-size: 13px;
   color: var(--text-secondary);
-  background: none;
-  border: none;
+  text-decoration: none;
   border-bottom: 2px solid transparent;
   padding: 12px 18px;
-  cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
+  display: block;
 }
-nav button:hover { color: var(--text-primary); }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+nav a:hover { color: var(--text-primary); }
+nav a.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
 
-/* ── Layout ── */
-main { padding: 28px 40px; max-width: 1200px; margin: 0 auto; }
-.panel { display: none; animation: fadein 0.2s ease; }
-.panel.active { display: block; }
-@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+/* ── Page sections ── */
+.page-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 52px 40px;
+  border-bottom: 1px solid var(--border);
+}
+.page-section:last-of-type { border-bottom: none; }
 
-.panel-header { margin-bottom: 20px; }
-.panel-header h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-.panel-header p  { font-size: 13px; color: var(--text-secondary); max-width: 580px; }
+.section-number { font-family: var(--mono); font-size: 10px; color: var(--text-hint); letter-spacing: 0.08em; margin-bottom: 6px; }
+.section-header { margin-bottom: 24px; }
+.section-header h2 { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 6px; }
+.section-header p { font-size: 13px; color: var(--text-secondary); max-width: 580px; line-height: 1.7; }
 
 /* ── Controls ── */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
+.controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 .controls label { font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.05em; }
 .btn-group { display: flex; gap: 3px; }
 .btn-group button {
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.12s;
+  font-family: var(--mono); font-size: 11px; padding: 5px 12px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary);
+  border-radius: 3px; cursor: pointer; transition: all 0.12s;
 }
 .btn-group button:hover { border-color: var(--accent); color: var(--accent); }
 .btn-group button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* ── Cards ── */
-.chart-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 24px;
-}
+/* ── Chart cards ── */
+.chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 24px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
-
 .chart-label { font-size: 13px; font-weight: 500; margin-bottom: 14px; }
 
 /* ── Stats ── */
 .stat-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.stat {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 18px;
-  flex: 1;
-  min-width: 130px;
-}
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; flex: 1; min-width: 130px; }
 .stat-val   { font-family: var(--mono); font-size: 20px; font-weight: 500; margin-bottom: 2px; }
 .stat-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.03em; }
 
@@ -145,636 +137,513 @@ main { padding: 28px 40px; max-width: 1200px; margin: 0 auto; }
 
 /* ── Tooltip ── */
 .tooltip {
-  position: fixed;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 10px 14px;
-  font-size: 12px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.09);
-  z-index: 200;
-  max-width: 220px;
-  line-height: 1.65;
+  position: fixed; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; padding: 10px 14px; font-size: 12px; pointer-events: none;
+  opacity: 0; transition: opacity 0.1s; box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+  z-index: 200; max-width: 220px; line-height: 1.65;
 }
 .tooltip .tt-title { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
 .tooltip .tt-row   { display: flex; justify-content: space-between; gap: 12px; }
 .tooltip .tt-val   { font-family: var(--mono); font-weight: 500; }
 
-/* ── Note ── */
 .note { font-size: 11px; color: var(--text-hint); margin-top: 10px; font-style: italic; }
+
+/* ── Footer ── */
+.footer-wrap { border-top: 1px solid var(--border); background: var(--surface); }
+footer { max-width: 1200px; margin: 0 auto; padding: 28px 40px; font-size: 12px; color: var(--text-hint); display: flex; gap: 24px; flex-wrap: wrap; }
 
 /* ── Loading ── */
 #loading {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 12px; z-index: 999;
 }
 #loading p { font-size: 13px; color: var(--text-secondary); }
-.spinner {
-  width: 28px; height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 svg text { font-family: var(--font); }
 </style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <p>Loading Chicago tract data…</p>
+<div id="loading"><div class="spinner"></div><p>Loading Chicago tract data…</p></div>
+
+<div class="hero-wrap">
+  <div class="hero">
+    <div class="hero-tag">DVS MENTORSHIP</div>
+    <h1>Bike Lanes &amp; Housing Costs in Chicago</h1>
+    <p>An exploration of the relationship between bike lane infrastructure and median rent at the census tract level across Cook County, Illinois — 2012 to 2022.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><strong>Geography</strong> — Cook County census tracts</div>
+      <div class="hero-meta-item"><strong>Years</strong> — 2012, 2016, 2022</div>
+      <div class="hero-meta-item"><strong>Source</strong> — ACS 5-year estimates + Chicago Data Portal</div>
+    </div>
+  </div>
 </div>
 
-<header>
-  <div>
-    <h1>Bike Lanes &amp; Housing Costs in Chicago</h1>
+<nav id="main-nav">
+  <div class="nav-inner">
+    <a href="#geo"    class="active">01 — Geographic snapshot</a>
+    <a href="#change"            >02 — Change map</a>
+    <a href="#trends"            >03 — Rent trends</a>
+    <a href="#scatter"           >04 — &#916;bike vs &#916;rent</a>
+    <a href="#dag"               >05 — Causal diagram</a>
   </div>
-  <p>Cook County census tracts &middot; 2012–2022</p>
-  <span class="tag">DVS MENTORSHIP</span>
-</header>
-
-<nav>
-  <button class="active" onclick="showPanel('geo',this)">Geographic snapshot</button>
-  <button onclick="showPanel('change',this)">Change map</button>
-  <button onclick="showPanel('trends',this)">Rent trends</button>
-  <button onclick="showPanel('scatter',this)">&#916;bike vs &#916;rent</button>
 </nav>
 
-<main>
-
-  <!-- ── Panel 1: Geographic snapshot ── -->
-  <div class="panel active" id="geo">
-    <div class="panel-header">
-      <h2>Median rent by census tract</h2>
-      <p>Spatial distribution of rent across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022.</p>
+<!-- 01 -->
+<section class="page-section" id="geo">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <h2>Median rent by census tract</h2>
+    <p>Spatial distribution of rent and bike infrastructure across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022.</p>
+  </div>
+  <div class="controls">
+    <label>YEAR</label>
+    <div class="btn-group" id="year-btns">
+      <button class="active" onclick="setGeoYear(2012,this)">2012</button>
+      <button onclick="setGeoYear(2016,this)">2016</button>
+      <button onclick="setGeoYear(2022,this)">2022</button>
     </div>
-    <div class="controls">
-      <label>YEAR</label>
-      <div class="btn-group">
-        <button class="active" onclick="setGeoYear(2012,this)">2012</button>
-        <button onclick="setGeoYear(2016,this)">2016</button>
-        <button onclick="setGeoYear(2022,this)">2022</button>
-      </div>
-      <label style="margin-left:12px">COLOR BY</label>
-      <div class="btn-group">
-        <button class="active" onclick="setGeoMetric('median_rent',this)">Median rent</button>
-        <button onclick="setGeoMetric('bike_length_km',this)">Bike lane km</button>
-        <button onclick="setGeoMetric('pct_white_nonhisp',this)">% White non-Hisp</button>
+    <label style="margin-left:12px">COLOR BY</label>
+    <div class="btn-group" id="metric-btns">
+      <button class="active" onclick="setGeoMetric('median_rent',this)">Median rent</button>
+      <button onclick="setGeoMetric('bike_length_km',this)">Bike lane km</button>
+      <button onclick="setGeoMetric('pct_white_nonhisp',this)">% White non-Hisp</button>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <svg id="geo-svg" style="width:100%;display:block"></svg>
+    <div class="legend" id="geo-legend"></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="page-section" id="change">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <h2>Change 2012 → 2022</h2>
+    <p>Which tracts saw the largest rent increases over the decade? Compare side by side with where bike lane infrastructure was added.</p>
+  </div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-label">&#916; Median rent ($)</div>
+      <svg id="change-rent-svg" style="width:100%;display:block"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#b2182b"></div>Large increase</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#f7f7f7;border:1px solid #ccc"></div>No change</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#2166ac"></div>Decrease</div>
       </div>
     </div>
     <div class="chart-wrap">
-      <svg id="geo-svg" style="width:100%;display:block"></svg>
-      <div class="legend" id="geo-legend"></div>
-    </div>
-  </div>
-
-  <!-- ── Panel 2: Change map ── -->
-  <div class="panel" id="change">
-    <div class="panel-header">
-      <h2>Change 2012 → 2022</h2>
-      <p>Which tracts saw the largest rent increases, and did they also gain bike lane infrastructure? Compare the two maps side by side.</p>
-    </div>
-    <div class="two-col">
-      <div class="chart-wrap">
-        <div class="chart-label">&#916; Median rent ($)</div>
-        <svg id="change-rent-svg" style="width:100%;display:block"></svg>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#b2182b"></div>Large increase</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#f7f7f7;border:1px solid #ccc"></div>No change</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#2166ac"></div>Decrease</div>
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <div class="chart-label">&#916; Bike lane km</div>
-        <svg id="change-bike-svg" style="width:100%;display:block"></svg>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>Lanes added</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#e8e6e0;border:1px solid #ccc"></div>No change</div>
-        </div>
+      <div class="chart-label">&#916; Bike lane km</div>
+      <svg id="change-bike-svg" style="width:100%;display:block"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>Lanes added</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#e8e6e0;border:1px solid #ccc"></div>No change</div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- ── Panel 3: Rent trends ── -->
-  <div class="panel" id="trends">
-    <div class="panel-header">
-      <h2>Rent trajectories 2012–2022</h2>
-      <p>Did tracts with bike lane infrastructure see different rent growth? Toggle the grouping to compare.</p>
-    </div>
-    <div class="controls">
-      <label>GROUP BY</label>
-      <div class="btn-group">
-        <button class="active" onclick="setTrendGroup('bike',this)">Bike lane presence</button>
-        <button onclick="setTrendGroup('income',this)">Income quartile</button>
-      </div>
-    </div>
-    <div class="stat-row" id="trend-stats"></div>
-    <div class="chart-wrap">
-      <svg id="trend-svg" style="width:100%;display:block"></svg>
-      <p class="note">Lines show median rent across tracts in each group across the three survey years.</p>
+<!-- 03 -->
+<section class="page-section" id="trends">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <h2>Rent trajectories 2012–2022</h2>
+    <p>Did tracts with bike lane infrastructure see different rent growth? Toggle the grouping to compare by bike lane presence or income quartile.</p>
+  </div>
+  <div class="controls">
+    <label>GROUP BY</label>
+    <div class="btn-group" id="trend-btns">
+      <button class="active" onclick="setTrendGroup('bike',this)">Bike lane presence</button>
+      <button onclick="setTrendGroup('income',this)">Income quartile</button>
     </div>
   </div>
-
-  <!-- ── Panel 4: Scatter ── -->
-  <div class="panel" id="scatter">
-    <div class="panel-header">
-      <h2>&#916; Bike lane km vs &#916; Median rent (2012–2022)</h2>
-      <p>Each dot is a census tract. The regression line shows the estimated relationship between gaining bike lanes and rent change, controlling for nothing else.</p>
-    </div>
-    <div class="stat-row" id="scatter-stats"></div>
-    <div class="chart-wrap">
-      <svg id="scatter-svg" style="width:100%;display:block"></svg>
-      <p class="note">Color encodes baseline 2012 rent. Hover over dots for tract details.</p>
-    </div>
+  <div class="stat-row" id="trend-stats"></div>
+  <div class="chart-wrap">
+    <svg id="trend-svg" style="width:100%;display:block"></svg>
+    <p class="note">Lines show median rent across tracts in each group across the three survey years.</p>
   </div>
+</section>
 
-</main>
+<!-- 04 -->
+<section class="page-section" id="scatter">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <h2>&#916; Bike lane km vs &#916; Median rent</h2>
+    <p>Each dot is a census tract. Does gaining more bike lane infrastructure predict rent change between 2012 and 2022? Color encodes baseline 2012 rent.</p>
+  </div>
+  <div class="stat-row" id="scatter-stats"></div>
+  <div class="chart-wrap">
+    <svg id="scatter-svg" style="width:100%;display:block"></svg>
+    <p class="note">Hover over dots for tract details. Dashed red line = OLS regression slope.</p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="page-section" id="dag">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <h2>Causal structure (DAG)</h2>
+    <p>A directed acyclic graph showing the assumed causal relationships in the model. Arrow thickness on the controls → rent path reflects that confounders are strongly significant. The bike lane → rent arrow is dashed because the coefficient (β = 5.71) is not statistically significant at p = 0.55 — consistent with the cross-sectional null result. The endogeneity path (controls → bike lanes) represents the placement concern that wealthier neighborhoods attract both bike infrastructure and higher rents — addressed here by the long-difference design.</p>
+  </div>
+  <div class="chart-wrap">
+    <svg width="100%" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <g>
+      <rect x="46" y="118" width="160" height="56" rx="8" stroke-width="0.5" fill="#F1EFE8" stroke="#5F5E5A"/>
+      <text x="126" y="140" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;fill:#2C2C2A">Controls</text>
+      <text x="126" y="158" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#5F5E5A">income, race, poverty, density</text>
+    </g>
+
+    <g>
+      <rect x="266" y="40" width="148" height="56" rx="8" stroke-width="0.5" fill="#E1F5EE" stroke="#0F6E56"/>
+      <text x="340" y="62" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;fill:#085041">Bike lane km</text>
+      <text x="340" y="80" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#0F6E56">&#916; 2012 → 2022</text>
+    </g>
+
+    <g>
+      <rect x="486" y="118" width="148" height="56" rx="8" stroke-width="0.5" fill="#E1F5EE" stroke="#0F6E56"/>
+      <text x="560" y="140" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;fill:#085041">Median rent</text>
+      <text x="560" y="158" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#0F6E56">&#916; 2012 → 2022</text>
+    </g>
+
+    <path d="M 206 128 C 230 100, 248 76, 266 68" fill="none" stroke="#B4B2A9" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-gray)"/>
+    <path d="M 206 158 C 340 200, 420 185, 486 163" fill="none" stroke="#888780" stroke-width="3" marker-end="url(#arr-gray)" opacity="0.5"/>
+    <path d="M 414 72 C 448 72, 468 100, 486 132" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arr-teal)"/>
+
+    <rect x="418" y="76" width="72" height="32" rx="4" fill="#ffffff" opacity="0.95"/>
+    <text x="454" y="88" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Mono',monospace;font-size:12px;fill:#0F6E56">&#946; = 5.71</text>
+    <text x="454" y="102" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#0F6E56">n.s. (p = 0.55)</text>
+
+    <text x="196" y="88" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#B4B2A9">endogeneity</text>
+    <text x="356" y="200" text-anchor="middle" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#888780">confounders ***</text>
+
+    <rect x="46" y="218" width="588" height="58" rx="6" fill="none" stroke="#e4e2dc" stroke-width="0.5"/>
+    <line x1="62" y1="240" x2="96" y2="240" stroke="#888780" stroke-width="3" opacity="0.5"/>
+    <text x="104" y="240" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#5F5E5A">Controls → rent (significant)</text>
+    <line x1="290" y1="240" x2="324" y2="240" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="332" y="240" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#0F6E56">Bike km → rent (not significant)</text>
+    <line x1="62" y1="262" x2="96" y2="262" stroke="#B4B2A9" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text x="104" y="262" dominant-baseline="central" style="font-family:'DM Sans',sans-serif;font-size:12px;fill:#B4B2A9">Endogeneity path — addressed by long-difference design</text>
+    </svg>
+  </div>
+</section>
+
+<div class="footer-wrap">
+  <footer>
+    <span><strong>Data:</strong> ACS 5-year estimates via tidycensus · Chicago Data Portal bike lane shapefiles</span>
+    <span><strong>Method:</strong> Tract-level pseudo-panel, long-difference 2012–2022</span>
+    <span><strong>Built with:</strong> D3.js · R · sf</span>
+  </footer>
+</div>
 
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ============================================================
-// GLOBALS
-// ============================================================
 let geoData, deltaData, panelData;
 let geoYear = 2012, geoMetric = 'median_rent', trendGroup = 'bike';
 const tip = document.getElementById('tooltip');
 
-// ============================================================
-// NAV
-// ============================================================
-function showPanel(id, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (btn) btn.classList.add('active');
-  // redraw active panel
-  if (id === 'geo')     drawGeo();
-  if (id === 'change')  drawChange();
-  if (id === 'trends')  drawTrends();
-  if (id === 'scatter') drawScatter();
-}
+// ── Nav: smooth scroll + active highlight on scroll ──
+document.querySelectorAll('nav a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+  });
+});
 
-// ============================================================
-// TOOLTIP HELPERS
-// ============================================================
-function showTip(html, event) {
-  tip.innerHTML = html;
-  tip.style.opacity = 1;
-  moveTip(event);
-}
-function moveTip(event) {
-  const x = event.clientX + 14, y = event.clientY - 10;
-  tip.style.left = Math.min(x, window.innerWidth - 230) + 'px';
-  tip.style.top  = Math.min(y, window.innerHeight - 120) + 'px';
+const ioObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('nav a').forEach(a =>
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id)
+      );
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+['geo','change','trends','scatter','dag'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) ioObserver.observe(el);
+});
+
+// ── Tooltip ──
+function showTip(html, event) { tip.innerHTML = html; tip.style.opacity = 1; moveTip(event); }
+function moveTip(e) {
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 230) + 'px';
+  tip.style.top  = Math.min(e.clientY - 10, window.innerHeight - 140) + 'px';
 }
 function hideTip() { tip.style.opacity = 0; }
-
 function fmt(v, type) {
   if (v == null || isNaN(v)) return '—';
   if (type === 'dollar') return '$' + Math.round(v).toLocaleString();
   if (type === 'pct')    return (v * 100).toFixed(1) + '%';
-  if (type === 'km')     return v.toFixed(2) + ' km';
+  if (type === 'km')     return (+v).toFixed(2) + ' km';
   return v;
 }
 
-// ============================================================
-// LOAD DATA
-// ============================================================
+// ── Load ──
 async function loadData() {
   const [geo, delta, panel] = await Promise.all([
     d3.json('data/cook_tracts_panel.geojson'),
     d3.csv('data/delta.csv', d3.autoType),
     d3.csv('data/panel_flat.csv', d3.autoType)
   ]);
-  geoData   = geo;
-  deltaData = delta;
-  panelData = panel;
-
+  geoData = geo; deltaData = delta; panelData = panel;
   document.getElementById('loading').style.display = 'none';
-  drawGeo();
+  drawGeo(); drawChange(); drawTrends(); drawScatter();
 }
 
-// ============================================================
-// PANEL 1 — GEOGRAPHIC SNAPSHOT
-// ============================================================
+// ── Section 1: Geo ──
 function setGeoYear(y, btn) {
   geoYear = y;
-  document.querySelectorAll('#geo .btn-group:first-of-type button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawGeo();
+  document.querySelectorAll('#year-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); drawGeo();
 }
 function setGeoMetric(m, btn) {
   geoMetric = m;
-  document.querySelectorAll('#geo .btn-group:last-of-type button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawGeo();
+  document.querySelectorAll('#metric-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); drawGeo();
 }
-
 function drawGeo() {
   const svg = d3.select('#geo-svg');
   svg.selectAll('*').remove();
-
   const W = svg.node().parentElement.clientWidth - 48;
   const H = Math.round(W * 0.62);
   svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-
-  // Filter features to selected year
   const features = geoData.features.filter(f => f.properties.year === geoYear);
-
-  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
-  const path = d3.geoPath().projection(projection);
-
+  const proj = d3.geoMercator().fitSize([W, H], { type:'FeatureCollection', features });
+  const path = d3.geoPath().projection(proj);
   const vals = features.map(f => +f.properties[geoMetric]).filter(v => !isNaN(v) && v > 0);
   const ext  = d3.extent(vals);
-
-  let colorScale, legendStops, metricLabel;
+  let cs, stops, label;
   if (geoMetric === 'median_rent') {
-    colorScale  = d3.scaleSequential(d3.interpolateBlues).domain(ext);
-    legendStops = [ext[0], (ext[0]+ext[1])/2, ext[1]];
-    metricLabel = 'Median rent';
+    cs = d3.scaleSequential(d3.interpolateBlues).domain(ext);
+    stops = [ext[0], (ext[0]+ext[1])/2, ext[1]]; label = 'Median rent';
   } else if (geoMetric === 'bike_length_km') {
-    colorScale  = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
-    legendStops = [0, ext[1]/2, ext[1]];
-    metricLabel = 'Bike lane km';
+    cs = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
+    stops = [0, ext[1]/2, ext[1]]; label = 'Bike lane km';
   } else {
-    colorScale  = d3.scaleSequential(d3.interpolatePurples).domain([0, 1]);
-    legendStops = [0, 0.5, 1];
-    metricLabel = '% White non-Hisp';
+    cs = d3.scaleSequential(d3.interpolatePurples).domain([0,1]);
+    stops = [0, 0.5, 1]; label = '% White non-Hisp';
   }
-
-  svg.selectAll('path')
-    .data(features)
-    .join('path')
+  svg.selectAll('path').data(features).join('path')
     .attr('d', path)
-    .attr('fill', d => {
-      const v = +d.properties[geoMetric];
-      return isNaN(v) ? '#e4e2dc' : colorScale(v);
-    })
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.3)
-    .on('mousemove', function(event, d) {
+    .attr('fill', d => { const v = +d.properties[geoMetric]; return isNaN(v) ? '#e4e2dc' : cs(v); })
+    .attr('stroke','#fff').attr('stroke-width', 0.3)
+    .on('mousemove', (event, d) => {
       const p = d.properties;
-      showTip(`
-        <div class="tt-title">${p.name || p.geoid}</div>
+      showTip(`<div class="tt-title">${p.name||p.geoid}</div>
         <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(p.median_rent,'dollar')}</span></div>
         <div class="tt-row"><span>Bike lanes</span><span class="tt-val">${fmt(p.bike_length_km,'km')}</span></div>
-        <div class="tt-row"><span>% White</span><span class="tt-val">${fmt(p.pct_white_nonhisp,'pct')}</span></div>
-      `, event);
+        <div class="tt-row"><span>% White</span><span class="tt-val">${fmt(p.pct_white_nonhisp,'pct')}</span></div>`, event);
     })
     .on('mouseleave', hideTip);
-
-  // Legend
   const leg = document.getElementById('geo-legend');
-  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${metricLabel}:</span>`;
-  legendStops.forEach(v => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `
-      <div class="legend-swatch" style="background:${colorScale(v)}"></div>
-      <span>${geoMetric === 'median_rent' ? fmt(v,'dollar') : geoMetric === 'bike_length_km' ? fmt(v,'km') : fmt(v,'pct')}</span>
-    `;
+  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${label}:</span>`;
+  stops.forEach(v => {
+    const item = document.createElement('div'); item.className = 'legend-item';
+    item.innerHTML = `<div class="legend-swatch" style="background:${cs(v)}"></div>
+      <span>${geoMetric==='median_rent'?fmt(v,'dollar'):geoMetric==='bike_length_km'?fmt(v,'km'):fmt(v,'pct')}</span>`;
     leg.appendChild(item);
   });
 }
 
-// ============================================================
-// PANEL 2 — CHANGE MAP
-// ============================================================
+// ── Section 2: Change ──
 function drawChange() {
-  drawChangeMap('#change-rent-svg', 'd_rent',    'diverging');
-  drawChangeMap('#change-bike-svg', 'd_bike_km', 'sequential');
+  drawChangeMap('#change-rent-svg','d_rent','diverging');
+  drawChangeMap('#change-bike-svg','d_bike_km','sequential');
 }
-
-function drawChangeMap(selector, field, mode) {
-  const svg = d3.select(selector);
-  svg.selectAll('*').remove();
-
-  // Use 2022 geometry features (one per tract), join delta
-  const deltaMap = new Map(deltaData.map(d => [d.geoid, d]));
-  const features = geoData.features
-    .filter(f => f.properties.year === 2022)
-    .map(f => ({ ...f, delta: deltaMap.get(f.properties.geoid) }))
-    .filter(f => f.delta);
-
-  const container = svg.node().parentElement;
-  const W = container.clientWidth - 48;
+function drawChangeMap(sel, field, mode) {
+  const svg = d3.select(sel); svg.selectAll('*').remove();
+  const W = svg.node().parentElement.clientWidth - 48;
   const H = Math.round(W * 1.1);
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-
-  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
-  const path = d3.geoPath().projection(projection);
-
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height', H);
+  const dm = new Map(deltaData.map(d => [d.geoid, d]));
+  const features = geoData.features.filter(f => f.properties.year===2022)
+    .map(f => ({...f, delta: dm.get(f.properties.geoid)})).filter(f => f.delta);
+  const proj = d3.geoMercator().fitSize([W,H],{type:'FeatureCollection',features});
+  const path = d3.geoPath().projection(proj);
   const vals = features.map(f => +f.delta[field]).filter(v => !isNaN(v));
   const ext  = d3.extent(vals);
-
-  let colorScale;
-  if (mode === 'diverging') {
-    const absMax = Math.max(Math.abs(ext[0]), Math.abs(ext[1]));
-    colorScale = d3.scaleDiverging(d3.interpolateRdBu).domain([-absMax, 0, absMax]);
-    colorScale = d3.scaleDiverging(t => d3.interpolateRdBu(1 - t)).domain([-absMax, 0, absMax]);
-  } else {
-    colorScale = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
-  }
-
-  svg.selectAll('path')
-    .data(features)
-    .join('path')
+  const cs = mode === 'diverging'
+    ? d3.scaleDiverging(t => d3.interpolateRdBu(1-t)).domain([-Math.max(Math.abs(ext[0]),Math.abs(ext[1])),0,Math.max(Math.abs(ext[0]),Math.abs(ext[1]))])
+    : d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
+  svg.selectAll('path').data(features).join('path')
     .attr('d', path)
-    .attr('fill', d => {
-      const v = +d.delta[field];
-      return isNaN(v) ? '#e4e2dc' : colorScale(v);
-    })
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.3)
-    .on('mousemove', function(event, d) {
-      showTip(`
-        <div class="tt-title">${d.properties.geoid}</div>
-        <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.delta.d_rent,'dollar')}</span></div>
-        <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.delta.d_bike_km,'km')}</span></div>
-        <div class="tt-row"><span>Base rent</span><span class="tt-val">${fmt(d.delta.base_rent,'dollar')}</span></div>
-      `, event);
-    })
+    .attr('fill', d => { const v = +d.delta[field]; return isNaN(v)?'#e4e2dc':cs(v); })
+    .attr('stroke','#fff').attr('stroke-width',0.3)
+    .on('mousemove',(event,d) => showTip(`<div class="tt-title">${d.properties.geoid}</div>
+      <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.delta.d_rent,'dollar')}</span></div>
+      <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.delta.d_bike_km,'km')}</span></div>
+      <div class="tt-row"><span>Base rent</span><span class="tt-val">${fmt(d.delta.base_rent,'dollar')}</span></div>`, event))
     .on('mouseleave', hideTip);
 }
 
-// ============================================================
-// PANEL 3 — RENT TRENDS
-// ============================================================
+// ── Section 3: Trends ──
 function setTrendGroup(g, btn) {
   trendGroup = g;
-  document.querySelectorAll('#trends .btn-group button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawTrends();
+  document.querySelectorAll('#trend-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); drawTrends();
 }
-
 function drawTrends() {
-  const svg = d3.select('#trend-svg');
-  svg.selectAll('*').remove();
-
+  const svg = d3.select('#trend-svg'); svg.selectAll('*').remove();
   const W = svg.node().parentElement.clientWidth - 48;
-  const H = 360;
-  const margin = { top: 20, right: 120, bottom: 40, left: 70 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-  const years = [2012, 2016, 2022];
-
-  // Group tracts
+  const H = 360, m = {top:20,right:160,bottom:40,left:70};
+  const iW = W-m.left-m.right, iH = H-m.top-m.bottom;
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${m.left},${m.top})`);
+  const years = [2012,2016,2022];
   let groups;
   if (trendGroup === 'bike') {
-    // Use 2016 bike data as "has lanes" indicator (mid-period)
-    const bikeByGeoid = new Map();
-    panelData.filter(d => d.year === 2016).forEach(d => bikeByGeoid.set(d.geoid, d.bike_length_km));
+    const bm = new Map();
+    panelData.filter(d => d.year===2016).forEach(d => bm.set(d.geoid, d.bike_length_km));
     groups = [
-      { key: 'Has bike lanes',    filter: d => (bikeByGeoid.get(d.geoid) || 0) > 0, color: '#2d6a4f' },
-      { key: 'No bike lanes',     filter: d => (bikeByGeoid.get(d.geoid) || 0) === 0, color: '#aaa89f' }
+      {key:'Has bike lanes', filter: d=>(bm.get(d.geoid)||0)>0, color:'#2d6a4f'},
+      {key:'No bike lanes',  filter: d=>(bm.get(d.geoid)||0)===0, color:'#aaa89f'}
     ];
   } else {
-    // Income quartiles based on 2012
-    const inc2012 = panelData.filter(d => d.year === 2012).map(d => d.median_income).sort(d3.ascending);
-    const q = [0, 0.25, 0.5, 0.75, 1].map(p => d3.quantile(inc2012, p));
-    const incByGeoid = new Map();
-    panelData.filter(d => d.year === 2012).forEach(d => incByGeoid.set(d.geoid, d.median_income));
+    const inc = panelData.filter(d=>d.year===2012).map(d=>d.median_income).sort(d3.ascending);
+    const q = [0,.25,.5,.75,1].map(p=>d3.quantile(inc,p));
+    const im = new Map();
+    panelData.filter(d=>d.year===2012).forEach(d=>im.set(d.geoid,d.median_income));
     groups = [
-      { key: 'Q4 (highest income)', filter: d => (incByGeoid.get(d.geoid)||0) >= q[3], color: '#1a3a4a' },
-      { key: 'Q3',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[2] && v < q[3]; }, color: '#4a7fa5' },
-      { key: 'Q2',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[1] && v < q[2]; }, color: '#95c0d6' },
-      { key: 'Q1 (lowest income)',  filter: d => (incByGeoid.get(d.geoid)||0) < q[1],  color: '#d4eaf5' }
+      {key:'Q4 (highest)', filter:d=>(im.get(d.geoid)||0)>=q[3], color:'#1a3a4a'},
+      {key:'Q3',           filter:d=>{const v=im.get(d.geoid)||0;return v>=q[2]&&v<q[3];}, color:'#4a7fa5'},
+      {key:'Q2',           filter:d=>{const v=im.get(d.geoid)||0;return v>=q[1]&&v<q[2];}, color:'#95c0d6'},
+      {key:'Q1 (lowest)',  filter:d=>(im.get(d.geoid)||0)<q[1], color:'#d4eaf5'}
     ];
   }
-
-  // Compute median rent per group per year
   const series = groups.map(grp => {
-    const geoids = new Set(panelData.filter(grp.filter).map(d => d.geoid));
+    const ids = new Set(panelData.filter(grp.filter).map(d=>d.geoid));
     const vals = years.map(yr => {
-      const rents = panelData
-        .filter(d => d.year === yr && geoids.has(d.geoid) && d.median_rent != null)
-        .map(d => d.median_rent);
-      return { year: yr, rent: d3.median(rents), n: rents.length };
+      const rents = panelData.filter(d=>d.year===yr&&ids.has(d.geoid)&&d.median_rent!=null).map(d=>d.median_rent);
+      return {year:yr, rent:d3.median(rents), n:rents.length};
     });
-    return { ...grp, vals };
+    return {...grp, vals};
   });
-
-  // Stats
-  const statsEl = document.getElementById('trend-stats');
-  statsEl.innerHTML = '';
+  const statsEl = document.getElementById('trend-stats'); statsEl.innerHTML='';
   series.forEach(s => {
-    const first = s.vals[0]?.rent, last = s.vals[s.vals.length-1]?.rent;
-    const change = last && first ? Math.round(last - first) : null;
-    const el = document.createElement('div');
-    el.className = 'stat';
-    el.innerHTML = `
-      <div class="stat-val" style="color:${s.color}">${change != null ? (change > 0 ? '+' : '') + '$' + change.toLocaleString() : '—'}</div>
-      <div class="stat-label">${s.key} — rent change</div>
-    `;
+    const f=s.vals[0]?.rent, l=s.vals.at(-1)?.rent;
+    const ch = f&&l ? Math.round(l-f) : null;
+    const el = document.createElement('div'); el.className='stat';
+    el.innerHTML=`<div class="stat-val" style="color:${s.color}">${ch!=null?(ch>0?'+':'')+' $'+Math.abs(ch).toLocaleString():'—'}</div><div class="stat-label">${s.key} — rent change</div>`;
     statsEl.appendChild(el);
   });
-
-  const allRents = series.flatMap(s => s.vals.map(v => v.rent)).filter(Boolean);
-  const x = d3.scalePoint().domain(years).range([0, iW]).padding(0.3);
-  const y = d3.scaleLinear().domain([d3.min(allRents) * 0.92, d3.max(allRents) * 1.05]).range([iH, 0]);
-
-  // Grid
+  const allR = series.flatMap(s=>s.vals.map(v=>v.rent)).filter(Boolean);
+  const x = d3.scalePoint().domain(years).range([0,iW]).padding(0.3);
+  const y = d3.scaleLinear().domain([d3.min(allR)*.92, d3.max(allR)*1.05]).range([iH,0]);
   g.append('g').selectAll('line').data(y.ticks(5)).join('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', d => y(d)).attr('y2', d => y(d))
-    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
-
-  // Axes
-  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(d => d))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '12px').style('fill', '#6b6860'); });
-
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d => '$' + d3.format(',')(d)))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '11px').style('fill', '#6b6860'); });
-
-  const line = d3.line().x(d => x(d.year)).y(d => y(d.rent)).defined(d => d.rent != null);
-
+    .attr('x1',0).attr('x2',iW).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#e4e2dc').attr('stroke-width',1);
+  g.append('g').attr('transform',`translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(d=>d))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();ax.selectAll('text').style('font-size','12px').style('fill','#6b6860');});
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>'$'+d3.format(',')(d)))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();ax.selectAll('text').style('font-size','11px').style('fill','#6b6860');});
+  const line = d3.line().x(d=>x(d.year)).y(d=>y(d.rent)).defined(d=>d.rent!=null);
   series.forEach(s => {
-    g.append('path').datum(s.vals).attr('fill', 'none')
-      .attr('stroke', s.color).attr('stroke-width', 2.5)
-      .attr('d', line);
-
-    g.selectAll(null).data(s.vals.filter(d => d.rent)).join('circle')
-      .attr('cx', d => x(d.year)).attr('cy', d => y(d.rent))
-      .attr('r', 4).attr('fill', s.color).attr('stroke', '#fff').attr('stroke-width', 1.5)
-      .on('mousemove', (event, d) => showTip(`
-        <div class="tt-title">${s.key} — ${d.year}</div>
+    g.append('path').datum(s.vals).attr('fill','none').attr('stroke',s.color).attr('stroke-width',2.5).attr('d',line);
+    g.selectAll(null).data(s.vals.filter(d=>d.rent)).join('circle')
+      .attr('cx',d=>x(d.year)).attr('cy',d=>y(d.rent)).attr('r',4)
+      .attr('fill',s.color).attr('stroke','#fff').attr('stroke-width',1.5)
+      .on('mousemove',(event,d)=>showTip(`<div class="tt-title">${s.key} — ${d.year}</div>
         <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(d.rent,'dollar')}</span></div>
-        <div class="tt-row"><span>Tracts</span><span class="tt-val">${d.n}</span></div>
-      `, event))
-      .on('mouseleave', hideTip);
-
-    // Label at end
-    const last = s.vals.filter(d => d.rent).at(-1);
-    if (last) {
-      g.append('text')
-        .attr('x', x(last.year) + 8).attr('y', y(last.rent) + 4)
-        .style('font-size', '11px').style('fill', s.color).style('font-weight', '500')
-        .text(s.key.split('(')[0].trim());
-    }
+        <div class="tt-row"><span>Tracts</span><span class="tt-val">${d.n}</span></div>`,event))
+      .on('mouseleave',hideTip);
+    const last = s.vals.filter(d=>d.rent).at(-1);
+    if (last) g.append('text').attr('x',x(last.year)+8).attr('y',y(last.rent)+4)
+      .style('font-size','11px').style('fill',s.color).style('font-weight','500').text(s.key);
   });
-
-  // Y axis label
-  g.append('text').attr('transform', 'rotate(-90)')
-    .attr('x', -iH / 2).attr('y', -52)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '11px').style('fill', '#6b6860')
-    .text('Median rent ($)');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-52)
+    .attr('text-anchor','middle').style('font-size','11px').style('fill','#6b6860').text('Median rent ($)');
 }
 
-// ============================================================
-// PANEL 4 — SCATTER
-// ============================================================
+// ── Section 4: Scatter ──
 function drawScatter() {
-  const svg = d3.select('#scatter-svg');
-  svg.selectAll('*').remove();
-
+  const svg = d3.select('#scatter-svg'); svg.selectAll('*').remove();
   const W = svg.node().parentElement.clientWidth - 48;
-  const H = 420;
-  const margin = { top: 20, right: 30, bottom: 50, left: 70 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-  const data = deltaData.filter(d => d.d_rent != null && d.d_bike_km != null);
-
-  // Stats
-  const statsEl = document.getElementById('scatter-stats');
-  statsEl.innerHTML = '';
-  const gainedLanes = data.filter(d => d.d_bike_km > 0);
-  const noLanes     = data.filter(d => d.d_bike_km === 0);
-  [
-    { val: data.length,                    label: 'Total tracts' },
-    { val: gainedLanes.length,             label: 'Gained bike lanes' },
-    { val: fmt(d3.median(data.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent' },
-    { val: fmt(d3.median(gainedLanes.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent (gained lanes)' },
-  ].forEach(s => {
-    const el = document.createElement('div');
-    el.className = 'stat';
-    el.innerHTML = `<div class="stat-val">${s.val}</div><div class="stat-label">${s.label}</div>`;
+  const H = 440, m = {top:20,right:30,bottom:52,left:72};
+  const iW = W-m.left-m.right, iH = H-m.top-m.bottom;
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${m.left},${m.top})`);
+  const data = deltaData.filter(d=>d.d_rent!=null&&d.d_bike_km!=null);
+  const statsEl = document.getElementById('scatter-stats'); statsEl.innerHTML='';
+  const gained = data.filter(d=>d.d_bike_km>0);
+  [{val:data.length,label:'Total tracts'},
+   {val:gained.length,label:'Gained bike lanes'},
+   {val:fmt(d3.median(data.map(d=>d.d_rent)),'dollar'),label:'Median &#916; rent (all)'},
+   {val:fmt(d3.median(gained.map(d=>d.d_rent)),'dollar'),label:'Median &#916; rent (gained lanes)'}
+  ].forEach(s=>{
+    const el=document.createElement('div');el.className='stat';
+    el.innerHTML=`<div class="stat-val">${s.val}</div><div class="stat-label">${s.label}</div>`;
     statsEl.appendChild(el);
   });
-
-  const x = d3.scaleLinear().domain([-0.2, d3.max(data, d => d.d_bike_km) * 1.05]).range([0, iW]);
-  const y = d3.scaleLinear().domain(d3.extent(data, d => d.d_rent)).nice().range([iH, 0]);
-  const color = d3.scaleSequential(d3.interpolateBlues)
-    .domain(d3.extent(data, d => d.base_rent));
-
-  // Grid
+  const x = d3.scaleLinear().domain([-0.2,d3.max(data,d=>d.d_bike_km)*1.05]).range([0,iW]);
+  const y = d3.scaleLinear().domain(d3.extent(data,d=>d.d_rent)).nice().range([iH,0]);
+  const color = d3.scaleSequential(d3.interpolateBlues).domain(d3.extent(data,d=>d.base_rent));
   g.append('g').selectAll('line').data(y.ticks(6)).join('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', d => y(d)).attr('y2', d => y(d))
-    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
-
-  // Zero line
+    .attr('x1',0).attr('x2',iW).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#e4e2dc').attr('stroke-width',1);
+  g.append('line').attr('x1',0).attr('x2',iW).attr('y1',y(0)).attr('y2',y(0))
+    .attr('stroke','#aaa89f').attr('stroke-width',1).attr('stroke-dasharray','4 3');
+  g.append('g').attr('transform',`translate(0,${iH})`).call(d3.axisBottom(x).ticks(6).tickFormat(d=>d+' km'))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();ax.selectAll('text').style('font-size','11px').style('fill','#6b6860');});
+  g.append('g').call(d3.axisLeft(y).ticks(6).tickFormat(d=>'$'+d3.format(',')(d)))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();ax.selectAll('text').style('font-size','11px').style('fill','#6b6860');});
+  const xm=d3.mean(data,d=>d.d_bike_km), ym=d3.mean(data,d=>d.d_rent);
+  const slope=d3.sum(data,d=>(d.d_bike_km-xm)*(d.d_rent-ym))/d3.sum(data,d=>(d.d_bike_km-xm)**2);
+  const intercept=ym-slope*xm;
+  const [x1r,x2r]=x.domain();
   g.append('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', y(0)).attr('y2', y(0))
-    .attr('stroke', '#aaa89f').attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
-
-  // Axes
-  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).ticks(6).tickFormat(d => d + ' km'))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
-  g.append('g').call(d3.axisLeft(y).ticks(6).tickFormat(d => '$' + d3.format(',')(d)))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
-
-  // OLS regression line
-  const n = data.length;
-  const xm = d3.mean(data, d => d.d_bike_km), ym = d3.mean(data, d => d.d_rent);
-  const slope = d3.sum(data, d => (d.d_bike_km - xm) * (d.d_rent - ym)) /
-                d3.sum(data, d => (d.d_bike_km - xm) ** 2);
-  const intercept = ym - slope * xm;
-  const x1r = x.domain()[0], x2r = x.domain()[1];
-  g.append('line')
-    .attr('x1', x(x1r)).attr('y1', y(intercept + slope * x1r))
-    .attr('x2', x(x2r)).attr('y2', y(intercept + slope * x2r))
-    .attr('stroke', '#c0392b').attr('stroke-width', 1.5)
-    .attr('stroke-dasharray', '5 3').attr('opacity', 0.7);
-
-  // Dots
+    .attr('x1',x(x1r)).attr('y1',y(intercept+slope*x1r))
+    .attr('x2',x(x2r)).attr('y2',y(intercept+slope*x2r))
+    .attr('stroke','#c0392b').attr('stroke-width',1.5).attr('stroke-dasharray','5 3').attr('opacity',0.7);
   g.selectAll('circle').data(data).join('circle')
-    .attr('cx', d => x(d.d_bike_km))
-    .attr('cy', d => y(d.d_rent))
-    .attr('r', 4)
-    .attr('fill', d => color(d.base_rent))
-    .attr('stroke', '#fff').attr('stroke-width', 0.8)
-    .attr('opacity', 0.75)
-    .on('mousemove', (event, d) => showTip(`
-      <div class="tt-title">${d.geoid}</div>
-      <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
-      <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
-      <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
-      <div class="tt-row"><span>&#916; Income</span><span class="tt-val">${fmt(d.d_income,'dollar')}</span></div>
-    `, event))
-    .on('mousemove', function(event, d) {
-      d3.select(this).attr('opacity', 1).attr('r', 5.5);
-      showTip(`
-        <div class="tt-title">${d.geoid}</div>
+    .attr('cx',d=>x(d.d_bike_km)).attr('cy',d=>y(d.d_rent))
+    .attr('r',4).attr('fill',d=>color(d.base_rent))
+    .attr('stroke','#fff').attr('stroke-width',0.8).attr('opacity',0.72)
+    .on('mousemove',function(event,d){
+      d3.select(this).attr('opacity',1).attr('r',5.5);
+      showTip(`<div class="tt-title">${d.geoid}</div>
         <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
         <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
         <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
-      `, event);
+        <div class="tt-row"><span>&#916; Income</span><span class="tt-val">${fmt(d.d_income,'dollar')}</span></div>`,event);
       moveTip(event);
     })
-    .on('mouseleave', function() {
-      d3.select(this).attr('opacity', 0.75).attr('r', 4);
-      hideTip();
-    });
-
-  // Axis labels
-  g.append('text').attr('x', iW/2).attr('y', iH + 42)
-    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
-    .text('Δ Bike lane km (2012 → 2022)');
-  g.append('text').attr('transform','rotate(-90)').attr('x', -iH/2).attr('y', -55)
-    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
-    .text('Δ Median rent ($)');
-
-  // Slope annotation
-  g.append('text').attr('x', iW - 4).attr('y', 14)
-    .attr('text-anchor','end').style('font-size','11px').style('fill','#c0392b')
-    .text(`slope: $${slope.toFixed(1)} per km`);
+    .on('mouseleave',function(){d3.select(this).attr('opacity',0.72).attr('r',4);hideTip();});
+  g.append('text').attr('x',iW/2).attr('y',iH+44).attr('text-anchor','middle')
+    .style('font-size','12px').style('fill','#6b6860').text('Δ Bike lane km (2012 → 2022)');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-56)
+    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860').text('Δ Median rent ($)');
+  g.append('text').attr('x',iW-4).attr('y',14).attr('text-anchor','end')
+    .style('font-size','11px').style('fill','#c0392b').text(`slope: $${slope.toFixed(1)} per km`);
 }
 
-// ============================================================
-// RESIZE
-// ============================================================
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const active = document.querySelector('.panel.active')?.id;
-    if (active === 'geo')     drawGeo();
-    if (active === 'change')  drawChange();
-    if (active === 'trends')  drawTrends();
-    if (active === 'scatter') drawScatter();
-  }, 200);
+// ── Resize ──
+let rt;
+window.addEventListener('resize',()=>{
+  clearTimeout(rt);
+  rt=setTimeout(()=>{ if(geoData){drawGeo();drawChange();drawTrends();drawScatter();} },200);
 });
 
-// ============================================================
-// INIT
-// ============================================================
-loadData().catch(err => {
-  document.getElementById('loading').innerHTML =
-    `<p style="color:#c0392b;max-width:400px;text-align:center">
+// ── Init ──
+loadData().catch(err=>{
+  document.getElementById('loading').innerHTML=`
+    <p style="color:#c0392b;max-width:400px;text-align:center;padding:20px">
       Could not load data files. Make sure <code>data/cook_tracts_panel.geojson</code>,
       <code>data/delta.csv</code>, and <code>data/panel_flat.csv</code> exist
-      and you are serving from a local server (not file://).
+      and you are serving via a local server (not file://).
     </p>`;
   console.error(err);
 });
