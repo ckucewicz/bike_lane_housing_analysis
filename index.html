@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bike Lanes & Housing — Chicago</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --border: #e4e2dc;
+  --text-primary: #1c1b18;
+  --text-secondary: #6b6860;
+  --text-hint: #aaa89f;
+  --accent: #2d6a4f;
+  --accent-light: #e6f2ec;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Header ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+header h1 { font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
+header p  { font-size: 13px; color: var(--text-secondary); }
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--accent-light);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+}
+
+/* ── Nav ── */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+nav button {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+nav button:hover { color: var(--text-primary); }
+nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+/* ── Layout ── */
+main { padding: 28px 40px; max-width: 1200px; margin: 0 auto; }
+.panel { display: none; animation: fadein 0.2s ease; }
+.panel.active { display: block; }
+@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.panel-header { margin-bottom: 20px; }
+.panel-header h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.panel-header p  { font-size: 13px; color: var(--text-secondary); max-width: 580px; }
+
+/* ── Controls ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.controls label { font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.05em; }
+.btn-group { display: flex; gap: 3px; }
+.btn-group button {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-group button:hover { border-color: var(--accent); color: var(--accent); }
+.btn-group button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── Cards ── */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px;
+}
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+.chart-label { font-size: 13px; font-weight: 500; margin-bottom: 14px; }
+
+/* ── Stats ── */
+.stat-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  flex: 1;
+  min-width: 130px;
+}
+.stat-val   { font-family: var(--mono); font-size: 20px; font-weight: 500; margin-bottom: 2px; }
+.stat-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.03em; }
+
+/* ── Legend ── */
+.legend { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+.legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── Tooltip ── */
+.tooltip {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 10px 14px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+  z-index: 200;
+  max-width: 220px;
+  line-height: 1.65;
+}
+.tooltip .tt-title { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+.tooltip .tt-row   { display: flex; justify-content: space-between; gap: 12px; }
+.tooltip .tt-val   { font-family: var(--mono); font-weight: 500; }
+
+/* ── Note ── */
+.note { font-size: 11px; color: var(--text-hint); margin-top: 10px; font-style: italic; }
+
+/* ── Loading ── */
+#loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; z-index: 999;
+}
+#loading p { font-size: 13px; color: var(--text-secondary); }
+.spinner {
+  width: 28px; height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+svg text { font-family: var(--font); }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Loading Chicago tract data…</p>
+</div>
+
+<header>
+  <div>
+    <h1>Bike Lanes &amp; Housing Costs in Chicago</h1>
+  </div>
+  <p>Cook County census tracts &middot; 2012–2022</p>
+  <span class="tag">DVS MENTORSHIP</span>
+</header>
+
+<nav>
+  <button class="active" onclick="showPanel('geo',this)">Geographic snapshot</button>
+  <button onclick="showPanel('change',this)">Change map</button>
+  <button onclick="showPanel('trends',this)">Rent trends</button>
+  <button onclick="showPanel('scatter',this)">&#916;bike vs &#916;rent</button>
+</nav>
+
+<main>
+
+  <!-- ── Panel 1: Geographic snapshot ── -->
+  <div class="panel active" id="geo">
+    <div class="panel-header">
+      <h2>Median rent by census tract</h2>
+      <p>Spatial distribution of rent across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022.</p>
+    </div>
+    <div class="controls">
+      <label>YEAR</label>
+      <div class="btn-group">
+        <button class="active" onclick="setGeoYear(2012,this)">2012</button>
+        <button onclick="setGeoYear(2016,this)">2016</button>
+        <button onclick="setGeoYear(2022,this)">2022</button>
+      </div>
+      <label style="margin-left:12px">COLOR BY</label>
+      <div class="btn-group">
+        <button class="active" onclick="setGeoMetric('median_rent',this)">Median rent</button>
+        <button onclick="setGeoMetric('bike_length_km',this)">Bike lane km</button>
+        <button onclick="setGeoMetric('pct_white_nonhisp',this)">% White non-Hisp</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg id="geo-svg" style="width:100%;display:block"></svg>
+      <div class="legend" id="geo-legend"></div>
+    </div>
+  </div>
+
+  <!-- ── Panel 2: Change map ── -->
+  <div class="panel" id="change">
+    <div class="panel-header">
+      <h2>Change 2012 → 2022</h2>
+      <p>Which tracts saw the largest rent increases, and did they also gain bike lane infrastructure? Compare the two maps side by side.</p>
+    </div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-label">&#916; Median rent ($)</div>
+        <svg id="change-rent-svg" style="width:100%;display:block"></svg>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#b2182b"></div>Large increase</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#f7f7f7;border:1px solid #ccc"></div>No change</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#2166ac"></div>Decrease</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-label">&#916; Bike lane km</div>
+        <svg id="change-bike-svg" style="width:100%;display:block"></svg>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>Lanes added</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#e8e6e0;border:1px solid #ccc"></div>No change</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Panel 3: Rent trends ── -->
+  <div class="panel" id="trends">
+    <div class="panel-header">
+      <h2>Rent trajectories 2012–2022</h2>
+      <p>Did tracts with bike lane infrastructure see different rent growth? Toggle the grouping to compare.</p>
+    </div>
+    <div class="controls">
+      <label>GROUP BY</label>
+      <div class="btn-group">
+        <button class="active" onclick="setTrendGroup('bike',this)">Bike lane presence</button>
+        <button onclick="setTrendGroup('income',this)">Income quartile</button>
+      </div>
+    </div>
+    <div class="stat-row" id="trend-stats"></div>
+    <div class="chart-wrap">
+      <svg id="trend-svg" style="width:100%;display:block"></svg>
+      <p class="note">Lines show median rent across tracts in each group across the three survey years.</p>
+    </div>
+  </div>
+
+  <!-- ── Panel 4: Scatter ── -->
+  <div class="panel" id="scatter">
+    <div class="panel-header">
+      <h2>&#916; Bike lane km vs &#916; Median rent (2012–2022)</h2>
+      <p>Each dot is a census tract. The regression line shows the estimated relationship between gaining bike lanes and rent change, controlling for nothing else.</p>
+    </div>
+    <div class="stat-row" id="scatter-stats"></div>
+    <div class="chart-wrap">
+      <svg id="scatter-svg" style="width:100%;display:block"></svg>
+      <p class="note">Color encodes baseline 2012 rent. Hover over dots for tract details.</p>
+    </div>
+  </div>
+
+</main>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ============================================================
+// GLOBALS
+// ============================================================
+let geoData, deltaData, panelData;
+let geoYear = 2012, geoMetric = 'median_rent', trendGroup = 'bike';
+const tip = document.getElementById('tooltip');
+
+// ============================================================
+// NAV
+// ============================================================
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  // redraw active panel
+  if (id === 'geo')     drawGeo();
+  if (id === 'change')  drawChange();
+  if (id === 'trends')  drawTrends();
+  if (id === 'scatter') drawScatter();
+}
+
+// ============================================================
+// TOOLTIP HELPERS
+// ============================================================
+function showTip(html, event) {
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+  moveTip(event);
+}
+function moveTip(event) {
+  const x = event.clientX + 14, y = event.clientY - 10;
+  tip.style.left = Math.min(x, window.innerWidth - 230) + 'px';
+  tip.style.top  = Math.min(y, window.innerHeight - 120) + 'px';
+}
+function hideTip() { tip.style.opacity = 0; }
+
+function fmt(v, type) {
+  if (v == null || isNaN(v)) return '—';
+  if (type === 'dollar') return '$' + Math.round(v).toLocaleString();
+  if (type === 'pct')    return (v * 100).toFixed(1) + '%';
+  if (type === 'km')     return v.toFixed(2) + ' km';
+  return v;
+}
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadData() {
+  const [geo, delta, panel] = await Promise.all([
+    d3.json('data/cook_tracts_panel.geojson'),
+    d3.csv('data/delta.csv', d3.autoType),
+    d3.csv('data/panel_flat.csv', d3.autoType)
+  ]);
+  geoData   = geo;
+  deltaData = delta;
+  panelData = panel;
+
+  document.getElementById('loading').style.display = 'none';
+  drawGeo();
+}
+
+// ============================================================
+// PANEL 1 — GEOGRAPHIC SNAPSHOT
+// ============================================================
+function setGeoYear(y, btn) {
+  geoYear = y;
+  document.querySelectorAll('#geo .btn-group:first-of-type button')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawGeo();
+}
+function setGeoMetric(m, btn) {
+  geoMetric = m;
+  document.querySelectorAll('#geo .btn-group:last-of-type button')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawGeo();
+}
+
+function drawGeo() {
+  const svg = d3.select('#geo-svg');
+  svg.selectAll('*').remove();
+
+  const W = svg.node().parentElement.clientWidth - 48;
+  const H = Math.round(W * 0.62);
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+
+  // Filter features to selected year
+  const features = geoData.features.filter(f => f.properties.year === geoYear);
+
+  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
+  const path = d3.geoPath().projection(projection);
+
+  const vals = features.map(f => +f.properties[geoMetric]).filter(v => !isNaN(v) && v > 0);
+  const ext  = d3.extent(vals);
+
+  let colorScale, legendStops, metricLabel;
+  if (geoMetric === 'median_rent') {
+    colorScale  = d3.scaleSequential(d3.interpolateBlues).domain(ext);
+    legendStops = [ext[0], (ext[0]+ext[1])/2, ext[1]];
+    metricLabel = 'Median rent';
+  } else if (geoMetric === 'bike_length_km') {
+    colorScale  = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
+    legendStops = [0, ext[1]/2, ext[1]];
+    metricLabel = 'Bike lane km';
+  } else {
+    colorScale  = d3.scaleSequential(d3.interpolatePurples).domain([0, 1]);
+    legendStops = [0, 0.5, 1];
+    metricLabel = '% White non-Hisp';
+  }
+
+  svg.selectAll('path')
+    .data(features)
+    .join('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const v = +d.properties[geoMetric];
+      return isNaN(v) ? '#e4e2dc' : colorScale(v);
+    })
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 0.3)
+    .on('mousemove', function(event, d) {
+      const p = d.properties;
+      showTip(`
+        <div class="tt-title">${p.name || p.geoid}</div>
+        <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(p.median_rent,'dollar')}</span></div>
+        <div class="tt-row"><span>Bike lanes</span><span class="tt-val">${fmt(p.bike_length_km,'km')}</span></div>
+        <div class="tt-row"><span>% White</span><span class="tt-val">${fmt(p.pct_white_nonhisp,'pct')}</span></div>
+      `, event);
+    })
+    .on('mouseleave', hideTip);
+
+  // Legend
+  const leg = document.getElementById('geo-legend');
+  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${metricLabel}:</span>`;
+  legendStops.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <div class="legend-swatch" style="background:${colorScale(v)}"></div>
+      <span>${geoMetric === 'median_rent' ? fmt(v,'dollar') : geoMetric === 'bike_length_km' ? fmt(v,'km') : fmt(v,'pct')}</span>
+    `;
+    leg.appendChild(item);
+  });
+}
+
+// ============================================================
+// PANEL 2 — CHANGE MAP
+// ============================================================
+function drawChange() {
+  drawChangeMap('#change-rent-svg', 'd_rent',    'diverging');
+  drawChangeMap('#change-bike-svg', 'd_bike_km', 'sequential');
+}
+
+function drawChangeMap(selector, field, mode) {
+  const svg = d3.select(selector);
+  svg.selectAll('*').remove();
+
+  // Use 2022 geometry features (one per tract), join delta
+  const deltaMap = new Map(deltaData.map(d => [d.geoid, d]));
+  const features = geoData.features
+    .filter(f => f.properties.year === 2022)
+    .map(f => ({ ...f, delta: deltaMap.get(f.properties.geoid) }))
+    .filter(f => f.delta);
+
+  const container = svg.node().parentElement;
+  const W = container.clientWidth - 48;
+  const H = Math.round(W * 1.1);
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+
+  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
+  const path = d3.geoPath().projection(projection);
+
+  const vals = features.map(f => +f.delta[field]).filter(v => !isNaN(v));
+  const ext  = d3.extent(vals);
+
+  let colorScale;
+  if (mode === 'diverging') {
+    const absMax = Math.max(Math.abs(ext[0]), Math.abs(ext[1]));
+    colorScale = d3.scaleDiverging(d3.interpolateRdBu).domain([-absMax, 0, absMax]);
+    colorScale = d3.scaleDiverging(t => d3.interpolateRdBu(1 - t)).domain([-absMax, 0, absMax]);
+  } else {
+    colorScale = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
+  }
+
+  svg.selectAll('path')
+    .data(features)
+    .join('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const v = +d.delta[field];
+      return isNaN(v) ? '#e4e2dc' : colorScale(v);
+    })
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 0.3)
+    .on('mousemove', function(event, d) {
+      showTip(`
+        <div class="tt-title">${d.properties.geoid}</div>
+        <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.delta.d_rent,'dollar')}</span></div>
+        <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.delta.d_bike_km,'km')}</span></div>
+        <div class="tt-row"><span>Base rent</span><span class="tt-val">${fmt(d.delta.base_rent,'dollar')}</span></div>
+      `, event);
+    })
+    .on('mouseleave', hideTip);
+}
+
+// ============================================================
+// PANEL 3 — RENT TRENDS
+// ============================================================
+function setTrendGroup(g, btn) {
+  trendGroup = g;
+  document.querySelectorAll('#trends .btn-group button')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawTrends();
+}
+
+function drawTrends() {
+  const svg = d3.select('#trend-svg');
+  svg.selectAll('*').remove();
+
+  const W = svg.node().parentElement.clientWidth - 48;
+  const H = 360;
+  const margin = { top: 20, right: 120, bottom: 40, left: 70 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const years = [2012, 2016, 2022];
+
+  // Group tracts
+  let groups;
+  if (trendGroup === 'bike') {
+    // Use 2016 bike data as "has lanes" indicator (mid-period)
+    const bikeByGeoid = new Map();
+    panelData.filter(d => d.year === 2016).forEach(d => bikeByGeoid.set(d.geoid, d.bike_length_km));
+    groups = [
+      { key: 'Has bike lanes',    filter: d => (bikeByGeoid.get(d.geoid) || 0) > 0, color: '#2d6a4f' },
+      { key: 'No bike lanes',     filter: d => (bikeByGeoid.get(d.geoid) || 0) === 0, color: '#aaa89f' }
+    ];
+  } else {
+    // Income quartiles based on 2012
+    const inc2012 = panelData.filter(d => d.year === 2012).map(d => d.median_income).sort(d3.ascending);
+    const q = [0, 0.25, 0.5, 0.75, 1].map(p => d3.quantile(inc2012, p));
+    const incByGeoid = new Map();
+    panelData.filter(d => d.year === 2012).forEach(d => incByGeoid.set(d.geoid, d.median_income));
+    groups = [
+      { key: 'Q4 (highest income)', filter: d => (incByGeoid.get(d.geoid)||0) >= q[3], color: '#1a3a4a' },
+      { key: 'Q3',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[2] && v < q[3]; }, color: '#4a7fa5' },
+      { key: 'Q2',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[1] && v < q[2]; }, color: '#95c0d6' },
+      { key: 'Q1 (lowest income)',  filter: d => (incByGeoid.get(d.geoid)||0) < q[1],  color: '#d4eaf5' }
+    ];
+  }
+
+  // Compute median rent per group per year
+  const series = groups.map(grp => {
+    const geoids = new Set(panelData.filter(grp.filter).map(d => d.geoid));
+    const vals = years.map(yr => {
+      const rents = panelData
+        .filter(d => d.year === yr && geoids.has(d.geoid) && d.median_rent != null)
+        .map(d => d.median_rent);
+      return { year: yr, rent: d3.median(rents), n: rents.length };
+    });
+    return { ...grp, vals };
+  });
+
+  // Stats
+  const statsEl = document.getElementById('trend-stats');
+  statsEl.innerHTML = '';
+  series.forEach(s => {
+    const first = s.vals[0]?.rent, last = s.vals[s.vals.length-1]?.rent;
+    const change = last && first ? Math.round(last - first) : null;
+    const el = document.createElement('div');
+    el.className = 'stat';
+    el.innerHTML = `
+      <div class="stat-val" style="color:${s.color}">${change != null ? (change > 0 ? '+' : '') + '$' + change.toLocaleString() : '—'}</div>
+      <div class="stat-label">${s.key} — rent change</div>
+    `;
+    statsEl.appendChild(el);
+  });
+
+  const allRents = series.flatMap(s => s.vals.map(v => v.rent)).filter(Boolean);
+  const x = d3.scalePoint().domain(years).range([0, iW]).padding(0.3);
+  const y = d3.scaleLinear().domain([d3.min(allRents) * 0.92, d3.max(allRents) * 1.05]).range([iH, 0]);
+
+  // Grid
+  g.append('g').selectAll('line').data(y.ticks(5)).join('line')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', d => y(d)).attr('y2', d => y(d))
+    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
+
+  // Axes
+  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(d => d))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '12px').style('fill', '#6b6860'); });
+
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d => '$' + d3.format(',')(d)))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '11px').style('fill', '#6b6860'); });
+
+  const line = d3.line().x(d => x(d.year)).y(d => y(d.rent)).defined(d => d.rent != null);
+
+  series.forEach(s => {
+    g.append('path').datum(s.vals).attr('fill', 'none')
+      .attr('stroke', s.color).attr('stroke-width', 2.5)
+      .attr('d', line);
+
+    g.selectAll(null).data(s.vals.filter(d => d.rent)).join('circle')
+      .attr('cx', d => x(d.year)).attr('cy', d => y(d.rent))
+      .attr('r', 4).attr('fill', s.color).attr('stroke', '#fff').attr('stroke-width', 1.5)
+      .on('mousemove', (event, d) => showTip(`
+        <div class="tt-title">${s.key} — ${d.year}</div>
+        <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(d.rent,'dollar')}</span></div>
+        <div class="tt-row"><span>Tracts</span><span class="tt-val">${d.n}</span></div>
+      `, event))
+      .on('mouseleave', hideTip);
+
+    // Label at end
+    const last = s.vals.filter(d => d.rent).at(-1);
+    if (last) {
+      g.append('text')
+        .attr('x', x(last.year) + 8).attr('y', y(last.rent) + 4)
+        .style('font-size', '11px').style('fill', s.color).style('font-weight', '500')
+        .text(s.key.split('(')[0].trim());
+    }
+  });
+
+  // Y axis label
+  g.append('text').attr('transform', 'rotate(-90)')
+    .attr('x', -iH / 2).attr('y', -52)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '11px').style('fill', '#6b6860')
+    .text('Median rent ($)');
+}
+
+// ============================================================
+// PANEL 4 — SCATTER
+// ============================================================
+function drawScatter() {
+  const svg = d3.select('#scatter-svg');
+  svg.selectAll('*').remove();
+
+  const W = svg.node().parentElement.clientWidth - 48;
+  const H = 420;
+  const margin = { top: 20, right: 30, bottom: 50, left: 70 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const data = deltaData.filter(d => d.d_rent != null && d.d_bike_km != null);
+
+  // Stats
+  const statsEl = document.getElementById('scatter-stats');
+  statsEl.innerHTML = '';
+  const gainedLanes = data.filter(d => d.d_bike_km > 0);
+  const noLanes     = data.filter(d => d.d_bike_km === 0);
+  [
+    { val: data.length,                    label: 'Total tracts' },
+    { val: gainedLanes.length,             label: 'Gained bike lanes' },
+    { val: fmt(d3.median(data.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent' },
+    { val: fmt(d3.median(gainedLanes.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent (gained lanes)' },
+  ].forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'stat';
+    el.innerHTML = `<div class="stat-val">${s.val}</div><div class="stat-label">${s.label}</div>`;
+    statsEl.appendChild(el);
+  });
+
+  const x = d3.scaleLinear().domain([-0.2, d3.max(data, d => d.d_bike_km) * 1.05]).range([0, iW]);
+  const y = d3.scaleLinear().domain(d3.extent(data, d => d.d_rent)).nice().range([iH, 0]);
+  const color = d3.scaleSequential(d3.interpolateBlues)
+    .domain(d3.extent(data, d => d.base_rent));
+
+  // Grid
+  g.append('g').selectAll('line').data(y.ticks(6)).join('line')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', d => y(d)).attr('y2', d => y(d))
+    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
+
+  // Zero line
+  g.append('line')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', y(0)).attr('y2', y(0))
+    .attr('stroke', '#aaa89f').attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
+
+  // Axes
+  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).ticks(6).tickFormat(d => d + ' km'))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
+  g.append('g').call(d3.axisLeft(y).ticks(6).tickFormat(d => '$' + d3.format(',')(d)))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
+
+  // OLS regression line
+  const n = data.length;
+  const xm = d3.mean(data, d => d.d_bike_km), ym = d3.mean(data, d => d.d_rent);
+  const slope = d3.sum(data, d => (d.d_bike_km - xm) * (d.d_rent - ym)) /
+                d3.sum(data, d => (d.d_bike_km - xm) ** 2);
+  const intercept = ym - slope * xm;
+  const x1r = x.domain()[0], x2r = x.domain()[1];
+  g.append('line')
+    .attr('x1', x(x1r)).attr('y1', y(intercept + slope * x1r))
+    .attr('x2', x(x2r)).attr('y2', y(intercept + slope * x2r))
+    .attr('stroke', '#c0392b').attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '5 3').attr('opacity', 0.7);
+
+  // Dots
+  g.selectAll('circle').data(data).join('circle')
+    .attr('cx', d => x(d.d_bike_km))
+    .attr('cy', d => y(d.d_rent))
+    .attr('r', 4)
+    .attr('fill', d => color(d.base_rent))
+    .attr('stroke', '#fff').attr('stroke-width', 0.8)
+    .attr('opacity', 0.75)
+    .on('mousemove', (event, d) => showTip(`
+      <div class="tt-title">${d.geoid}</div>
+      <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
+      <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
+      <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
+      <div class="tt-row"><span>&#916; Income</span><span class="tt-val">${fmt(d.d_income,'dollar')}</span></div>
+    `, event))
+    .on('mousemove', function(event, d) {
+      d3.select(this).attr('opacity', 1).attr('r', 5.5);
+      showTip(`
+        <div class="tt-title">${d.geoid}</div>
+        <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
+        <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
+        <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
+      `, event);
+      moveTip(event);
+    })
+    .on('mouseleave', function() {
+      d3.select(this).attr('opacity', 0.75).attr('r', 4);
+      hideTip();
+    });
+
+  // Axis labels
+  g.append('text').attr('x', iW/2).attr('y', iH + 42)
+    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
+    .text('Δ Bike lane km (2012 → 2022)');
+  g.append('text').attr('transform','rotate(-90)').attr('x', -iH/2).attr('y', -55)
+    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
+    .text('Δ Median rent ($)');
+
+  // Slope annotation
+  g.append('text').attr('x', iW - 4).attr('y', 14)
+    .attr('text-anchor','end').style('font-size','11px').style('fill','#c0392b')
+    .text(`slope: $${slope.toFixed(1)} per km`);
+}
+
+// ============================================================
+// RESIZE
+// ============================================================
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const active = document.querySelector('.panel.active')?.id;
+    if (active === 'geo')     drawGeo();
+    if (active === 'change')  drawChange();
+    if (active === 'trends')  drawTrends();
+    if (active === 'scatter') drawScatter();
+  }, 200);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+loadData().catch(err => {
+  document.getElementById('loading').innerHTML =
+    `<p style="color:#c0392b;max-width:400px;text-align:center">
+      Could not load data files. Make sure <code>data/cook_tracts_panel.geojson</code>,
+      <code>data/delta.csv</code>, and <code>data/panel_flat.csv</code> exist
+      and you are serving from a local server (not file://).
+    </p>`;
+  console.error(err);
+});
+</script>
+</body>
+</html>
