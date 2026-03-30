@@ -1,0 +1,13 @@
+# R environment files
+.Renviron
+.Rhistory
+.RData
+
+# Data outputs
+*.csv
+*.geojson
+*.gpkg
+
+# R project files
+.Rproj.user/
+
