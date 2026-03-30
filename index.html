@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bike Lanes & Housing — Chicago</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -183,20 +185,46 @@ svg text { font-family: var(--font); }
 
 <nav id="main-nav">
   <div class="nav-inner">
-    <a href="#geo"    class="active">01 — Geographic snapshot</a>
-    <a href="#change"            >02 — Change map</a>
-    <a href="#trends"            >03 — Rent trends</a>
-    <a href="#scatter"           >04 — &#916;bike vs &#916;rent</a>
-    <a href="#dag"               >05 — Causal diagram</a>
+    <a href="#bikemap" class="active">01 — Bike lane map</a>
+    <a href="#geo"             >02 — Geographic snapshot</a>
+    <a href="#change"          >03 — Change map</a>
+    <a href="#trends"          >04 — Rent trends</a>
+    <a href="#scatter"         >05 — &#916;bike vs &#916;rent</a>
+    <a href="#dag"             >06 — Causal diagram</a>
   </div>
 </nav>
 
 <!-- 01 -->
-<section class="page-section" id="geo">
+<section class="page-section" id="bikemap">
   <div class="section-header">
     <div class="section-number">01</div>
+    <h2>Chicago bike lane network by era</h2>
+    <p>All bike lane segments across Cook County, colored by which shapefile vintage they appear in. Since installation dates aren't recorded per-segment, era is inferred from three dataset snapshots. Pan and zoom to explore the network — click any segment for street name and length.</p>
+  </div>
+  <div class="controls">
+    <label>TOGGLE ERAS</label>
+    <div class="btn-group">
+      <button class="active" id="toggle-pre2016"   onclick="toggleEra('Pre-2016', this)">Pre-2016</button>
+      <button class="active" id="toggle-2016-2020" onclick="toggleEra('2016–2020', this)">2016–2020</button>
+      <button class="active" id="toggle-2020-2022" onclick="toggleEra('2020–2022', this)">2020–2022</button>
+    </div>
+    <div class="legend" style="margin-left:16px;margin-bottom:0">
+      <div class="legend-item"><div class="legend-swatch" style="background:#1a3a4a"></div>Pre-2016</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>2016–2020</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#95c0d6"></div>2020–2022</div>
+    </div>
+  </div>
+  <div class="chart-wrap" style="padding:0;overflow:hidden;border-radius:6px">
+    <div id="bike-map" style="height:520px;width:100%;border-radius:6px"></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="page-section" id="geo">
+  <div class="section-header">
+    <div class="section-number">02</div>
     <h2>Median rent by census tract</h2>
-    <p>Spatial distribution of rent and bike infrastructure across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022.</p>
+    <p>Spatial distribution of rent and bike infrastructure across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022. Click any tract for details.</p>
   </div>
   <div class="controls">
     <label>YEAR</label>
@@ -212,44 +240,36 @@ svg text { font-family: var(--font); }
       <button onclick="setGeoMetric('pct_white_nonhisp',this)">% White non-Hisp</button>
     </div>
   </div>
-  <div class="chart-wrap">
-    <svg id="geo-svg" style="width:100%;display:block"></svg>
-    <div class="legend" id="geo-legend"></div>
+  <div class="chart-wrap" style="padding:0;overflow:hidden;border-radius:6px">
+    <div id="geo-map" style="height:520px;width:100%;border-radius:6px"></div>
   </div>
-</section>
-
-<!-- 02 -->
-<section class="page-section" id="change">
-  <div class="section-header">
-    <div class="section-number">02</div>
-    <h2>Change 2012 → 2022</h2>
-    <p>Which tracts saw the largest rent increases over the decade? Compare side by side with where bike lane infrastructure was added.</p>
-  </div>
-  <div class="two-col">
-    <div class="chart-wrap">
-      <div class="chart-label">&#916; Median rent ($)</div>
-      <svg id="change-rent-svg" style="width:100%;display:block"></svg>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-swatch" style="background:#b2182b"></div>Large increase</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#f7f7f7;border:1px solid #ccc"></div>No change</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#2166ac"></div>Decrease</div>
-      </div>
-    </div>
-    <div class="chart-wrap">
-      <div class="chart-label">&#916; Bike lane km</div>
-      <svg id="change-bike-svg" style="width:100%;display:block"></svg>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>Lanes added</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#e8e6e0;border:1px solid #ccc"></div>No change</div>
-      </div>
-    </div>
-  </div>
+  <div class="legend" id="geo-legend" style="margin-top:12px"></div>
 </section>
 
 <!-- 03 -->
-<section class="page-section" id="trends">
+<section class="page-section" id="change">
   <div class="section-header">
     <div class="section-number">03</div>
+    <h2>Change 2012 → 2022</h2>
+    <p>Which tracts saw the largest rent increases over the decade? Toggle between rent change and bike lane growth. Click any tract for details.</p>
+  </div>
+  <div class="controls">
+    <label>SHOW</label>
+    <div class="btn-group" id="change-btns">
+      <button class="active" onclick="setChangeMetric('d_rent',this)">&#916; Median rent</button>
+      <button onclick="setChangeMetric('d_bike_km',this)">&#916; Bike lane km</button>
+    </div>
+  </div>
+  <div class="chart-wrap" style="padding:0;overflow:hidden;border-radius:6px">
+    <div id="change-map" style="height:520px;width:100%;border-radius:6px"></div>
+  </div>
+  <div class="legend" id="change-legend" style="margin-top:12px"></div>
+</section>
+
+<!-- 04 -->
+<section class="page-section" id="trends">
+  <div class="section-header">
+    <div class="section-number">04</div>
     <h2>Rent trajectories 2012–2022</h2>
     <p>Did tracts with bike lane infrastructure see different rent growth? Toggle the grouping to compare by bike lane presence or income quartile.</p>
   </div>
@@ -270,7 +290,7 @@ svg text { font-family: var(--font); }
 <!-- 04 -->
 <section class="page-section" id="scatter">
   <div class="section-header">
-    <div class="section-number">04</div>
+    <div class="section-number">05</div>
     <h2>&#916; Bike lane km vs &#916; Median rent</h2>
     <p>Each dot is a census tract. Does gaining more bike lane infrastructure predict rent change between 2012 and 2022? Color encodes baseline 2012 rent.</p>
   </div>
@@ -284,7 +304,7 @@ svg text { font-family: var(--font); }
 <!-- 05 -->
 <section class="page-section" id="dag">
   <div class="section-header">
-    <div class="section-number">05</div>
+    <div class="section-number">06</div>
     <h2>Causal structure (DAG)</h2>
     <p>A directed acyclic graph showing the assumed causal relationships in the model. Arrow thickness on the controls → rent path reflects that confounders are strongly significant. The bike lane → rent arrow is dashed because the coefficient (β = 5.71) is not statistically significant at p = 0.55 — consistent with the cross-sectional null result. The endogeneity path (controls → bike lanes) represents the placement concern that wealthier neighborhoods attract both bike infrastructure and higher rents — addressed here by the long-difference design.</p>
   </div>
@@ -351,7 +371,7 @@ svg text { font-family: var(--font); }
 
 <script>
 let geoData, deltaData, panelData;
-let geoYear = 2012, geoMetric = 'median_rent', trendGroup = 'bike';
+let trendGroup = 'bike';
 const tip = document.getElementById('tooltip');
 
 // ── Nav: smooth scroll + active highlight on scroll ──
@@ -372,7 +392,7 @@ const ioObserver = new IntersectionObserver(entries => {
     }
   });
 }, { rootMargin: '-30% 0px -60% 0px' });
-['geo','change','trends','scatter','dag'].forEach(id => {
+['geo','change','trends','scatter','dag','bikemap'].forEach(id => {
   const el = document.getElementById(id);
   if (el) ioObserver.observe(el);
 });
@@ -401,94 +421,180 @@ async function loadData() {
   ]);
   geoData = geo; deltaData = delta; panelData = panel;
   document.getElementById('loading').style.display = 'none';
-  drawGeo(); drawChange(); drawTrends(); drawScatter();
+  drawTrends(); drawScatter();
+
+  // Init Leaflet maps lazily when sections scroll into view
+  const geoObs = new IntersectionObserver(e => { if(e[0].isIntersecting){ initGeoMap(); geoObs.disconnect(); } }, {threshold:0.1});
+  const changeObs = new IntersectionObserver(e => { if(e[0].isIntersecting){ initChangeMap(); changeObs.disconnect(); } }, {threshold:0.1});
+  if(document.getElementById('geo')) geoObs.observe(document.getElementById('geo'));
+  if(document.getElementById('change')) changeObs.observe(document.getElementById('change'));
 }
 
-// ── Section 1: Geo ──
+// ── Section 2: Geo map (Leaflet) ──
+let geoMap = null, geoLayer = null;
+let geoYear = 2012, geoMetric = 'median_rent';
+
+const geoMetricConfig = {
+  median_rent:      { label: 'Median rent', format: v => '$' + Math.round(v).toLocaleString(), colors: ['#f0f4f8','#1a3a4a'] },
+  bike_length_km:   { label: 'Bike lane km', format: v => (+v).toFixed(2) + ' km', colors: ['#f0f7f4','#2d6a4f'] },
+  pct_white_nonhisp:{ label: '% White non-Hisp', format: v => (v*100).toFixed(1)+'%', colors: ['#f5f0fa','#4a2d7a'] }
+};
+
+function initGeoMap() {
+  if (geoMap) return;
+  geoMap = L.map('geo-map').setView([41.85, -87.65], 10);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(geoMap);
+  renderGeoLayer();
+}
+
+function renderGeoLayer() {
+  if (!geoMap || !geoData) return;
+  if (geoLayer) geoMap.removeLayer(geoLayer);
+
+  const features = geoData.features.filter(f => f.properties.year === geoYear);
+  const cfg = geoMetricConfig[geoMetric];
+  const vals = features.map(f => +f.properties[geoMetric]).filter(v => !isNaN(v) && v > 0);
+  const ext = [Math.min(...vals), Math.max(...vals)];
+  const scale = d3.scaleSequential().domain(ext)
+    .interpolator(d3.interpolateRgb(cfg.colors[0], cfg.colors[1]));
+
+  geoLayer = L.geoJSON({ type: 'FeatureCollection', features }, {
+    style: f => {
+      const v = +f.properties[geoMetric];
+      return { fillColor: isNaN(v) || v === 0 ? '#e4e2dc' : scale(v), fillOpacity: 0.75, color: '#fff', weight: 0.5 };
+    },
+    onEachFeature: (f, layer) => {
+      const p = f.properties;
+      layer.bindPopup(`
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;min-width:180px">
+          <div style="font-weight:500;font-size:13px;margin-bottom:6px;color:#1c1b18">${p.name || p.geoid}</div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860">
+            <span>Median rent</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">$${Math.round(p.median_rent||0).toLocaleString()}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+            <span>Bike lanes</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">${(+p.bike_length_km||0).toFixed(2)} km</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+            <span>% White</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">${((+p.pct_white_nonhisp||0)*100).toFixed(1)}%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+            <span>Median income</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">$${Math.round(p.median_income||0).toLocaleString()}</span>
+          </div>
+        </div>
+      `);
+    }
+  }).addTo(geoMap);
+
+  // Legend
+  const leg = document.getElementById('geo-legend');
+  const steps = 5;
+  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${cfg.label}:</span>`;
+  for (let i = 0; i <= steps; i++) {
+    const v = ext[0] + (ext[1] - ext[0]) * (i / steps);
+    const item = document.createElement('div'); item.className = 'legend-item';
+    item.innerHTML = `<div class="legend-swatch" style="background:${scale(v)}"></div><span style="font-size:11px;color:var(--text-secondary)">${cfg.format(v)}</span>`;
+    leg.appendChild(item);
+  }
+}
+
 function setGeoYear(y, btn) {
   geoYear = y;
   document.querySelectorAll('#year-btns button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); drawGeo();
+  btn.classList.add('active');
+  if (!geoMap) initGeoMap(); else renderGeoLayer();
 }
 function setGeoMetric(m, btn) {
   geoMetric = m;
   document.querySelectorAll('#metric-btns button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); drawGeo();
-}
-function drawGeo() {
-  const svg = d3.select('#geo-svg');
-  svg.selectAll('*').remove();
-  const W = svg.node().parentElement.clientWidth - 48;
-  const H = Math.round(W * 0.62);
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-  const features = geoData.features.filter(f => f.properties.year === geoYear);
-  const proj = d3.geoMercator().fitSize([W, H], { type:'FeatureCollection', features });
-  const path = d3.geoPath().projection(proj);
-  const vals = features.map(f => +f.properties[geoMetric]).filter(v => !isNaN(v) && v > 0);
-  const ext  = d3.extent(vals);
-  let cs, stops, label;
-  if (geoMetric === 'median_rent') {
-    cs = d3.scaleSequential(d3.interpolateBlues).domain(ext);
-    stops = [ext[0], (ext[0]+ext[1])/2, ext[1]]; label = 'Median rent';
-  } else if (geoMetric === 'bike_length_km') {
-    cs = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
-    stops = [0, ext[1]/2, ext[1]]; label = 'Bike lane km';
-  } else {
-    cs = d3.scaleSequential(d3.interpolatePurples).domain([0,1]);
-    stops = [0, 0.5, 1]; label = '% White non-Hisp';
-  }
-  svg.selectAll('path').data(features).join('path')
-    .attr('d', path)
-    .attr('fill', d => { const v = +d.properties[geoMetric]; return isNaN(v) ? '#e4e2dc' : cs(v); })
-    .attr('stroke','#fff').attr('stroke-width', 0.3)
-    .on('mousemove', (event, d) => {
-      const p = d.properties;
-      showTip(`<div class="tt-title">${p.name||p.geoid}</div>
-        <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(p.median_rent,'dollar')}</span></div>
-        <div class="tt-row"><span>Bike lanes</span><span class="tt-val">${fmt(p.bike_length_km,'km')}</span></div>
-        <div class="tt-row"><span>% White</span><span class="tt-val">${fmt(p.pct_white_nonhisp,'pct')}</span></div>`, event);
-    })
-    .on('mouseleave', hideTip);
-  const leg = document.getElementById('geo-legend');
-  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${label}:</span>`;
-  stops.forEach(v => {
-    const item = document.createElement('div'); item.className = 'legend-item';
-    item.innerHTML = `<div class="legend-swatch" style="background:${cs(v)}"></div>
-      <span>${geoMetric==='median_rent'?fmt(v,'dollar'):geoMetric==='bike_length_km'?fmt(v,'km'):fmt(v,'pct')}</span>`;
-    leg.appendChild(item);
-  });
+  btn.classList.add('active');
+  if (!geoMap) initGeoMap(); else renderGeoLayer();
 }
 
-// ── Section 2: Change ──
-function drawChange() {
-  drawChangeMap('#change-rent-svg','d_rent','diverging');
-  drawChangeMap('#change-bike-svg','d_bike_km','sequential');
+// ── Section 3: Change map (Leaflet) ──
+let changeMap = null, changeLayer = null, changeMetric = 'd_rent';
+let changeGeoData = null;
+
+const changeMetricConfig = {
+  d_rent:    { label: 'Δ Median rent ($)', format: v => (v>0?'+':'')+'$'+Math.round(v).toLocaleString(), colors: ['#2166ac','#f7f7f7','#b2182b'] },
+  d_bike_km: { label: 'Δ Bike lane km', format: v => (v>0?'+':'')+v.toFixed(2)+' km', colors: ['#f0f7f4','#2d6a4f'] }
+};
+
+function initChangeMap() {
+  if (changeMap) return;
+  changeMap = L.map('change-map').setView([41.85, -87.65], 10);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(changeMap);
+
+  fetch('data/delta_geo.geojson')
+    .then(r => r.json())
+    .then(data => { changeGeoData = data; renderChangeLayer(); })
+    .catch(err => console.error('delta_geo.geojson failed:', err));
 }
-function drawChangeMap(sel, field, mode) {
-  const svg = d3.select(sel); svg.selectAll('*').remove();
-  const W = svg.node().parentElement.clientWidth - 48;
-  const H = Math.round(W * 1.1);
-  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height', H);
-  const dm = new Map(deltaData.map(d => [d.geoid, d]));
-  const features = geoData.features.filter(f => f.properties.year===2022)
-    .map(f => ({...f, delta: dm.get(f.properties.geoid)})).filter(f => f.delta);
-  const proj = d3.geoMercator().fitSize([W,H],{type:'FeatureCollection',features});
-  const path = d3.geoPath().projection(proj);
-  const vals = features.map(f => +f.delta[field]).filter(v => !isNaN(v));
-  const ext  = d3.extent(vals);
-  const cs = mode === 'diverging'
-    ? d3.scaleDiverging(t => d3.interpolateRdBu(1-t)).domain([-Math.max(Math.abs(ext[0]),Math.abs(ext[1])),0,Math.max(Math.abs(ext[0]),Math.abs(ext[1]))])
-    : d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
-  svg.selectAll('path').data(features).join('path')
-    .attr('d', path)
-    .attr('fill', d => { const v = +d.delta[field]; return isNaN(v)?'#e4e2dc':cs(v); })
-    .attr('stroke','#fff').attr('stroke-width',0.3)
-    .on('mousemove',(event,d) => showTip(`<div class="tt-title">${d.properties.geoid}</div>
-      <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.delta.d_rent,'dollar')}</span></div>
-      <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.delta.d_bike_km,'km')}</span></div>
-      <div class="tt-row"><span>Base rent</span><span class="tt-val">${fmt(d.delta.base_rent,'dollar')}</span></div>`, event))
-    .on('mouseleave', hideTip);
+
+function renderChangeLayer() {
+  if (!changeMap || !changeGeoData) return;
+  if (changeLayer) changeMap.removeLayer(changeLayer);
+
+  const cfg = changeMetricConfig[changeMetric];
+  const vals = changeGeoData.features.map(f => +f.properties[changeMetric]).filter(v => !isNaN(v));
+  const ext = [Math.min(...vals), Math.max(...vals)];
+
+  let scale;
+  if (changeMetric === 'd_rent') {
+    const absMax = Math.max(Math.abs(ext[0]), Math.abs(ext[1]));
+    scale = d3.scaleDiverging(d3.interpolateRdBu).domain([absMax, 0, -absMax]);
+  } else {
+    scale = d3.scaleSequential().domain([0, ext[1]])
+      .interpolator(d3.interpolateRgb(cfg.colors[0], cfg.colors[1]));
+  }
+
+  changeLayer = L.geoJSON(changeGeoData, {
+    style: f => {
+      const v = +f.properties[changeMetric];
+      return { fillColor: isNaN(v) ? '#e4e2dc' : scale(v), fillOpacity: 0.75, color: '#fff', weight: 0.5 };
+    },
+    onEachFeature: (f, layer) => {
+      const p = f.properties;
+      const dRent = +p.d_rent, dBike = +p.d_bike_km;
+      layer.bindPopup(`
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;min-width:180px">
+          <div style="font-weight:500;font-size:13px;margin-bottom:6px;color:#1c1b18">${p.geoid}</div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860">
+            <span>&#916; Rent</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:${dRent>0?'#b2182b':'#2166ac'}">${dRent>0?'+':''}$${Math.round(dRent).toLocaleString()}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+            <span>&#916; Bike km</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#2d6a4f">${dBike>0?'+':''}${dBike.toFixed(2)} km</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+            <span>Base rent (2012)</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">$${Math.round(+p.base_rent||0).toLocaleString()}</span>
+          </div>
+        </div>
+      `);
+    }
+  }).addTo(changeMap);
+
+  // Legend
+  const leg = document.getElementById('change-legend');
+  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${cfg.label}:</span>`;
+  const steps = changeMetric === 'd_rent' ? 6 : 5;
+  for (let i = 0; i <= steps; i++) {
+    const v = ext[0] + (ext[1] - ext[0]) * (i / steps);
+    const item = document.createElement('div'); item.className = 'legend-item';
+    item.innerHTML = `<div class="legend-swatch" style="background:${scale(v)}"></div><span style="font-size:11px;color:var(--text-secondary)">${cfg.format(v)}</span>`;
+    leg.appendChild(item);
+  }
 }
+
+function setChangeMetric(m, btn) {
+  changeMetric = m;
+  document.querySelectorAll('#change-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (!changeMap) initChangeMap(); else renderChangeLayer();
+}
+
 
 // ── Section 3: Trends ──
 function setTrendGroup(g, btn) {
@@ -630,11 +736,87 @@ function drawScatter() {
     .style('font-size','11px').style('fill','#c0392b').text(`slope: $${slope.toFixed(1)} per km`);
 }
 
-// ── Resize ──
+// ── Section 6: Bike lane map (Leaflet) ──
+let bikeMap = null;
+let eraLayers = {};
+const eraColors = {
+  'Pre-2016':  '#1a3a4a',
+  '2016–2020': '#2d6a4f',
+  '2020–2022': '#95c0d6'
+};
+
+function initBikeMap() {
+  if (bikeMap) return;
+  bikeMap = L.map('bike-map', { zoomControl: true }).setView([41.85, -87.65], 11);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(bikeMap);
+
+  fetch('data/bike_lanes_by_era.geojson')
+    .then(r => r.json())
+    .then(data => {
+      const eras = ['Pre-2016', '2016–2020', '2020–2022'];
+      eras.forEach(era => {
+        const layer = L.geoJSON(data, {
+          filter: f => f.properties.era === era,
+          style: {
+            color: eraColors[era],
+            weight: era === 'Pre-2016' ? 2 : 2,
+            opacity: era === '2020–2022' ? 0.85 : 0.75
+          },
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties;
+            const street = p.street || 'Unknown street';
+            const length = p.length_mi ? (+p.length_mi).toFixed(2) + ' mi' : '—';
+            layer.bindPopup(`
+              <div style="font-family:'DM Sans',sans-serif;font-size:12px;min-width:160px">
+                <div style="font-weight:500;font-size:13px;margin-bottom:6px;color:${eraColors[era]}">${street}</div>
+                <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860">
+                  <span>Length</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:#1c1b18">${length}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;gap:12px;color:#6b6860;margin-top:3px">
+                  <span>Era</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:${eraColors[era]}">${era}</span>
+                </div>
+              </div>
+            `);
+          }
+        }).addTo(bikeMap);
+        eraLayers[era] = layer;
+      });
+    })
+    .catch(err => console.error('Bike lane GeoJSON failed:', err));
+}
+
+function toggleEra(era, btn) {
+  btn.classList.toggle('active');
+  if (!bikeMap) return;
+  if (eraLayers[era]) {
+    if (bikeMap.hasLayer(eraLayers[era])) {
+      bikeMap.removeLayer(eraLayers[era]);
+    } else {
+      bikeMap.addLayer(eraLayers[era]);
+    }
+  }
+}
+
+// Init map when section scrolls into view
+const bikeMapObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    initBikeMap();
+    bikeMapObserver.disconnect();
+  }
+}, { threshold: 0.1 });
+const bikeMapEl = document.getElementById('bikemap');
+if (bikeMapEl) bikeMapObserver.observe(bikeMapEl);
+
+
 let rt;
 window.addEventListener('resize',()=>{
   clearTimeout(rt);
-  rt=setTimeout(()=>{ if(geoData){drawGeo();drawChange();drawTrends();drawScatter();} },200);
+  rt=setTimeout(()=>{ if(panelData){drawTrends();drawScatter();} },200);
 });
 
 // ── Init ──
