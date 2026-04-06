@@ -381,3 +381,57 @@ cat("  delta_dataset_2012_2022.csv\n")
 cat("  model_cross_sectional_2022.csv\n")
 cat("  model_delta_2012_2022.csv\n")
 cat("  model_comparison.html\n")
+
+
+library(tidyverse)
+library(sf)
+library(rmapshaper)
+
+# Load spatial base
+cook_tracts_sf <- st_read("../cook_tracts_2022.gpkg", quiet = TRUE) %>%
+  st_transform(4326)
+
+# ── Export 1: delta GeoJSON (for change map) ──
+delta_df <- read_csv("../delta_dataset_2012_2022.csv") %>%
+  mutate(geoid = as.character(geoid))
+
+delta_geo <- cook_tracts_sf %>%
+  ms_simplify(keep = 0.05, keep_shapes = TRUE) %>%
+  left_join(
+    delta_df %>% select(geoid, d_rent, d_bike_km,
+                        base_rent, base_bike_km, d_income),
+    by = "geoid"
+  ) %>%
+  filter(!is.na(d_rent))
+
+st_write(delta_geo, "data/delta_geo.geojson", delete_dsn = TRUE)
+cat("Delta GeoJSON done:", nrow(delta_geo), "tracts\n")
+
+# ── Export 2: panel GeoJSON (for geographic snapshot) ──
+panel <- read_csv("../panel_cook_tracts.csv")
+
+cook_tracts_sf %>%
+  ms_simplify(keep = 0.05, keep_shapes = TRUE) %>%
+  left_join(
+    panel %>% select(geoid, year, median_rent, bike_length_km,
+                     median_income, pct_white_nonhisp),
+    by = "geoid"
+  ) %>%
+  filter(!is.na(year)) %>%
+  st_write("data/cook_tracts_panel.geojson", delete_dsn = TRUE)
+
+cat("Panel GeoJSON done\n")
+
+cook_tracts_sf %>%
+  ms_simplify(keep = 0.05, keep_shapes = TRUE) %>%
+  left_join(
+    panel %>% 
+      mutate(geoid = as.character(geoid)) %>%
+      select(geoid, year, median_rent, bike_length_km,
+             median_income, pct_white_nonhisp),
+    by = "geoid"
+  ) %>%
+  filter(!is.na(year)) %>%
+  st_write("data/cook_tracts_panel.geojson", delete_dsn = TRUE)
+
+cat("Panel GeoJSON done\n")
